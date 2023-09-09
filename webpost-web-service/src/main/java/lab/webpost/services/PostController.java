@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,35 +23,56 @@ public class PostController {
     @Autowired
     PostRepository postRepository;
 
-    // TODO: get all Posts
-    public ResponseEntity<List<Post>> getPosts() {
-        return null;
+    
+    @GetMapping("/posts")
+    public ResponseEntity<List<Post>> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-    //TODO: getting post by id
-    public ResponseEntity<Post> getPostById( Long id) {
-        // TODO: check if post is null
-        return null;
+    
+    @GetMapping("/posts/{id}")
+    public ResponseEntity<Post> getPostById(@PathVariable Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (optionalPost.isPresent()) {
+            Post post = optionalPost.get();
+            return new ResponseEntity<>(post, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    //TODO: find by title
-    public ResponseEntity<List<Post>> getPostByTitle( String title) {
-        return null;
+    
+    @GetMapping("/posts/title/{title}") 
+    public ResponseEntity<List<Post>> getPostsByTitle(@PathVariable String title) {
+        List<Post> posts = postRepository.findByTitle(title);
+        return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-    // TODO: adding new post
-    public ResponseEntity<String> addPost( Post post) {
-        return null;
+   
+    @PostMapping("/posts")
+    public ResponseEntity<String> addPost(@RequestBody Post post) {
+        postRepository.save(post);
+        return new ResponseEntity<>(HttpStatus.OK); 
     }
 
-    // TODO: delete post by id
-    public ResponseEntity<String> deletePost( Long id) {
-        return null;
+   
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        Optional<Post> optionalPost = postRepository.findById(id);
+        if (optionalPost.isPresent()) {
+            postRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    //TODO: delete all posts
+    @DeleteMapping("/posts")
     public ResponseEntity<String> deleteAllPosts() {
-        return null;
+        postRepository.deleteAll();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }
+
+
